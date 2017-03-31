@@ -1,6 +1,8 @@
 var keys = require("./keys.js");
 const https = require("https");
 const OAuth = require('oauth');
+const popsicle = require('popsicle');
+const fs = require('fs');
 
 var app = {
 	defaultSong: "The Sign",
@@ -33,27 +35,53 @@ var app = {
 	},
 
 	spotifySong: function(song) {
-		var options = {
-			url: 'https://api.spotify.com/v1/search?q=' + song + "&type=track",
-			method: 'GET'
-		};
-		var req = https.get(options.url, (res) => {
-			console.log('statusCode:', res.statusCode);
-			console.log('headers:', res.headers);
-
-			res.on('data', (d) => {
-				process.stdout.write(d);
+		popsicle.get("https://api.spotify.com/v1/search?q=" + song + "&type=track")
+			.use(popsicle.plugins.parse(['json', 'urlencoded']))
+			.then((res) => {
+				if (!res.body.tracks.items) {
+					popsicle.get("https://api.spotify.com/v1/tracks/" + res.body.tracks.items[0].id)
+						.use(popsicle.plugins.parse(['json', 'urlencoded']))
+						.then((res) => {
+							console.log("Song Name: " + res.body.name);
+							console.log("Artist Name: " + res.body.artists[0].name);
+							console.log("Preview: " + res.body.preview_url);
+							console.log("Album Name: " + res.body.album.name);
+						});
+				} else {
+					popsicle.get("https://api.spotify.com/v1/tracks/0hrBpAOgrt8RXigk83LLNE")
+						.use(popsicle.plugins.parse(['json', 'urlencoded']))
+						.then((res) => {
+							console.log("Song Name: " + res.body.name);
+							console.log("Artist Name: " + res.body.artists[0].name);
+							console.log("Preview: " + res.body.preview_url);
+							console.log("Album Name: " + res.body.album.name);
+						});
+				}
 			});
-		});
-
-		req.on('error', (e) => {
-			console.error(e);
-		});
-		req.end();
 	},
 
 	retrieveMovieInfo: function(movie) {
+		popsicle.get("http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&r=json")
+			.then((res) => {
+				var movieJSON = JSON.parse(res.body);
+				if (!movieJSON.Title) {
+					popsicle.get("http://www.omdbapi.com/?t=Mr+Nobody&y=&plot=short&r=json")
+						.use(popsicle.plugins.parse(['json', 'urlencoded']))
+						.then((res) => {
 
+						});
+				} else {
+					console.log("* Title: " + movieJSON.Title);
+					console.log("* Year: " + movieJSON.year);
+					console.log("* IMDB Rating: " + movieJSON.imdbRating);
+					console.log("* Country: " + movieJSON.Country);
+					console.log("* Language: " + movieJSON.Language);
+					console.log("* Plot: " + movieJSON.Plot);
+					console.log("* Actors: " + movieJSON.Actors);
+					console.log("* RottenTomatoes Rating: " + movieJSON.Ratings[1].Value);
+					console.log("* Rotten Tomatoes URL: https://www.rottentomatoes.com/m/" + movieJSON.Title.toLowerCase().replace(/\ /g, "_").replace(/\./g, ""));
+				}
+			});
 	},
 
 	doWhatItSays: function() {
