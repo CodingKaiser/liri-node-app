@@ -5,8 +5,21 @@ const popsicle = require('popsicle');
 const fs = require('fs');
 
 var app = {
-	defaultSong: "The Sign",
+	defaultSongId: "0hrBpAOgrt8RXigk83LLNE",
 	defaultMovie: "Mr. Nobody",
+
+	parseStdIn: function(argArray) {
+		var userCommand = argArray[2];
+		if (userCommand === "my-tweets") {
+			this.displayTweets();
+		} else if (userCommand === "spotify-this-song") {
+			this.spotifySong(argArray[3]);
+		} else if (userCommand === "movie-this") {
+			this.retrieveMovieInfo(argArray[3]);
+		} else if (userCommand === "do-what-it-says") {
+			this.doWhatItSays();
+		}
+	},
 
 	displayTweets: function() {
 		var oauth = new OAuth.OAuth(
@@ -35,10 +48,11 @@ var app = {
 	},
 
 	spotifySong: function(song) {
+		var me = this;
 		popsicle.get("https://api.spotify.com/v1/search?q=" + song + "&type=track")
 			.use(popsicle.plugins.parse(['json', 'urlencoded']))
 			.then((res) => {
-				if (!res.body.tracks.items) {
+				if (res.body.tracks.items.length) {
 					popsicle.get("https://api.spotify.com/v1/tracks/" + res.body.tracks.items[0].id)
 						.use(popsicle.plugins.parse(['json', 'urlencoded']))
 						.then((res) => {
@@ -48,7 +62,7 @@ var app = {
 							console.log("Album Name: " + res.body.album.name);
 						});
 				} else {
-					popsicle.get("https://api.spotify.com/v1/tracks/0hrBpAOgrt8RXigk83LLNE")
+					popsicle.get("https://api.spotify.com/v1/tracks/" + me.defaultSongId)
 						.use(popsicle.plugins.parse(['json', 'urlencoded']))
 						.then((res) => {
 							console.log("Song Name: " + res.body.name);
@@ -85,17 +99,18 @@ var app = {
 	},
 
 	doWhatItSays: function() {
-
+		var me = this;
+		fs.readFile("random.txt", "utf-8", function(err, data) {
+			if (err) console.log("Here's an error: \n" + err);
+			var command = data.split(",")[0];
+			var medium = "";
+			if (data.split(",")[1]) {
+				medium = data.split(",")[1].replace(/["']/g, "");
+			}
+			console.log(command + " " + medium);
+			me.parseStdIn(["plchldr", "plchldr", command, medium]);
+		});
 	},
 };
 
-var userCommand = process.argv[2];
-if (userCommand === "my-tweets") {
-	app.displayTweets();
-} else if (userCommand === "spotify-this-song") {
-	app.spotifySong(process.argv[3]);
-} else if (userCommand === "movie-this") {
-	app.retrieveMovieInfo(process.argv[3]);
-} else if (userCommand === "do-what-it-says") {
-	app.doWhatItSays();
-}
+app.parseStdIn(process.argv);
