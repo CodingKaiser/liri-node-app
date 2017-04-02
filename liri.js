@@ -37,21 +37,22 @@ var app = {
 			keys.twitterKeys.access_token_key,
 			keys.twitterKeys.access_token_secret,
 			function (e, data, res) {
-				if (e) console.error(e);
-				JSON.parse(data)
-				JSON.parse(data).forEach(function (tweet) {
-					console.log();
-					console.log("Tweet: '" + tweet.text + "' was created " + tweet.created_at);
-				});
+				if (!e) {
+					JSON.parse(data).forEach(function (tweet) {
+						console.log();
+						console.log("Tweet: '" + tweet.text + "' was created " + tweet.created_at);
+					});
+				}
 			}
 		);
 	},
 
 	spotifySong: function(song) {
 		var me = this;
-		popsicle.get("https://api.spotify.com/v1/search?q=" + song + "&type=track")
+		popsicle.get("https://api.spotify.com/v1/search?type=track&q=" + song)
 			.use(popsicle.plugins.parse(['json', 'urlencoded']))
 			.then((res) => {
+				console.log(res);
 				if (res.body.tracks.items.length) {
 					popsicle.get("https://api.spotify.com/v1/tracks/" + res.body.tracks.items[0].id)
 						.use(popsicle.plugins.parse(['json', 'urlencoded']))
@@ -79,10 +80,19 @@ var app = {
 			.then((res) => {
 				var movieJSON = JSON.parse(res.body);
 				if (!movieJSON.Title) {
-					popsicle.get("http://www.omdbapi.com/?t=Mr+Nobody&y=&plot=short&r=json")
-						.use(popsicle.plugins.parse(['json', 'urlencoded']))
+					popsicle.get("http://www.omdbapi.com/?t=" + this.defaultMovie + "&y=&plot=short&r=json")
 						.then((res) => {
-
+							console.log(res);
+							movieJSON = JSON.parse(res.body);
+							console.log("* Title: " + movieJSON.Title);
+							console.log("* Year: " + movieJSON.year);
+							console.log("* IMDB Rating: " + movieJSON.imdbRating);
+							console.log("* Country: " + movieJSON.Country);
+							console.log("* Language: " + movieJSON.Language);
+							console.log("* Plot: " + movieJSON.Plot);
+							console.log("* Actors: " + movieJSON.Actors);
+							console.log("* RottenTomatoes Rating: " + movieJSON.Ratings[1].Value);
+							console.log("* Rotten Tomatoes URL: https://www.rottentomatoes.com/m/" + movieJSON.Title.toLowerCase().replace(/\ /g, "_").replace(/\./g, ""));
 						});
 				} else {
 					console.log("* Title: " + movieJSON.Title);

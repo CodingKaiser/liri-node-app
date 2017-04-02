@@ -1,0 +1,28 @@
+{
+  "name": "liri-node-app",
+  "version": "1.0.0",
+  "description": "Give Liri a command, get back a response.",
+  "main": "liri.js",
+  "dependencies": {
+    "popsicle": "^9.1.0",
+    "oauth": "^0.9.15"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "my-tweets"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CodingKaiser/liri-node-app.git"
+  },
+  "keywords": [
+    "liri",
+    "command-line"
+  ],
+  "author": "Falko Noe",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CodingKaiser/liri-node-app/issues"
+  },
+  "homepage": "https://github.com/CodingKaiser/liri-node-app#readme"
+}
