@@ -4,8 +4,8 @@
   "description": "Give Liri a command, get back a response.",
   "main": "liri.js",
   "dependencies": {
-    "popsicle": "^9.1.0",
-    "oauth": "^0.9.15"
+    "oauth": "^0.9.15",
+    "popsicle": "^9.1.0"
   },
   "devDependencies": {},
   "scripts": {

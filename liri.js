@@ -1,5 +1,5 @@
 var keys = require("./keys.js");
-const https = require("https");
+const spotify = require('spotify');
 const OAuth = require('oauth');
 const popsicle = require('popsicle');
 const fs = require('fs');
@@ -9,15 +9,17 @@ var app = {
 	defaultMovie: "Mr. Nobody",
 
 	parseStdIn: function(argArray) {
-		var userCommand = argArray[2];
+		var userCommand = process.argv[2].toLowerCase();
 		if (userCommand === "my-tweets") {
 			this.displayTweets();
 		} else if (userCommand === "spotify-this-song") {
-			this.spotifySong(argArray[3]);
+			this.spotifySong(this.concatUserInput());
 		} else if (userCommand === "movie-this") {
-			this.retrieveMovieInfo(argArray[3]);
+			this.retrieveMovieInfo(this.concatUserInput());
 		} else if (userCommand === "do-what-it-says") {
 			this.doWhatItSays();
+		} else {
+			this.tellUserTheyScrewedUp();
 		}
 	},
 
@@ -49,10 +51,10 @@ var app = {
 
 	spotifySong: function(song) {
 		var me = this;
+		console.log("");
 		popsicle.get("https://api.spotify.com/v1/search?type=track&q=" + song)
 			.use(popsicle.plugins.parse(['json', 'urlencoded']))
 			.then((res) => {
-				console.log(res);
 				if (res.body.tracks.items.length) {
 					popsicle.get("https://api.spotify.com/v1/tracks/" + res.body.tracks.items[0].id)
 						.use(popsicle.plugins.parse(['json', 'urlencoded']))
@@ -121,6 +123,23 @@ var app = {
 			me.parseStdIn(["plchldr", "plchldr", command, medium]);
 		});
 	},
+
+	tellUserTheyScrewedUp: function() {
+		console.log();
+		console.log("Please enter valid command e.g.:");
+		console.log("'spotify-this-song' OR 'movie-this' OR 'do-what-it-says'");
+	},
+
+	concatUserInput: function() {
+		var userInput = "";
+		process.argv.slice(3).forEach(function(elem) {
+			userInput += elem + " "
+		});
+		if (!userInput) {
+			throw "You didn't tell what to search for!";
+		}
+		return userInput;
+	}
 };
 
 app.parseStdIn(process.argv);
