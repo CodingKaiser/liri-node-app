@@ -111,10 +111,10 @@ var app = {
 	},
 
 	_printOutSpotifyData: function(res) {
-		console.log("Song Name: " + res.body.name);
-		console.log("Artist Name: " + res.body.artists[0].name);
-		console.log("Preview: " + res.body.preview_url);
-		console.log("Album Name: " + res.body.album.name);
+		console.log("* Song Name: " + res.body.name);
+		console.log("* Artist Name: " + res.body.artists[0].name);
+		console.log("* Preview: " + res.body.preview_url);
+		console.log("* Album Name: " + res.body.album.name);
 	},
 
 	_printOutMovieData: function(movieJSON) {
