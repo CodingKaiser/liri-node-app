@@ -54,23 +54,19 @@ var app = {
 		popsicle.get("https://api.spotify.com/v1/search?type=track&q=" + song)
 			.use(popsicle.plugins.parse(['json', 'urlencoded']))
 			.then((res) => {
+				// if tracks found, display top one
 				if (res.body.tracks.items.length) {
 					popsicle.get("https://api.spotify.com/v1/tracks/" + res.body.tracks.items[0].id)
 						.use(popsicle.plugins.parse(['json', 'urlencoded']))
 						.then((res) => {
-							console.log("Song Name: " + res.body.name);
-							console.log("Artist Name: " + res.body.artists[0].name);
-							console.log("Preview: " + res.body.preview_url);
-							console.log("Album Name: " + res.body.album.name);
+							this._printOutSpotifyData(res);
 						});
 				} else {
+					// If no tracks found, choose default
 					popsicle.get("https://api.spotify.com/v1/tracks/" + me.defaultSongId)
 						.use(popsicle.plugins.parse(['json', 'urlencoded']))
 						.then((res) => {
-							console.log("Song Name: " + res.body.name);
-							console.log("Artist Name: " + res.body.artists[0].name);
-							console.log("Preview: " + res.body.preview_url);
-							console.log("Album Name: " + res.body.album.name);
+							this._printOutSpotifyData(res);
 						});
 				}
 			});
@@ -80,7 +76,8 @@ var app = {
 		popsicle.get("http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&r=json")
 			.then((res) => {
 				var movieJSON = JSON.parse(res.body);
-				console.log();
+				console.log(); // empty space in stdout for A E S T H E T I C S
+				// If movie not found, default to greatest film ever made
 				if (!movieJSON.Title) {
 					popsicle.get("http://www.omdbapi.com/?t=" + this.defaultMovie + "&y=&plot=short&r=json")
 						.then((res) => {
@@ -113,6 +110,13 @@ var app = {
 		console.log("'spotify-this-song' OR 'movie-this' OR 'do-what-it-says'");
 	},
 
+	_printOutSpotifyData: function(res) {
+		console.log("Song Name: " + res.body.name);
+		console.log("Artist Name: " + res.body.artists[0].name);
+		console.log("Preview: " + res.body.preview_url);
+		console.log("Album Name: " + res.body.album.name);
+	},
+
 	_printOutMovieData: function(movieJSON) {
 		console.log("* Title: " + movieJSON.Title);
 		console.log("* Year: " + movieJSON.year);
@@ -128,11 +132,13 @@ var app = {
 
 	_concatUserInput: function(argArray) {
 		var userInput = "";
+		// concatenate all strings past the command together
 		argArray.slice(3).forEach(function(elem) {
 			userInput += elem + " "
 		});
 		if (!userInput) {
-			throw "You didn't tell what to search for!";
+			// If user gave no query, tell them they screwed up
+			throw "You didn't tell me what to search for!";
 		}
 		return userInput;
 	}
