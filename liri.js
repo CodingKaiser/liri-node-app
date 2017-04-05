@@ -8,17 +8,17 @@ var app = {
 	defaultMovie: "Mr. Nobody",
 
 	parseStdIn: function(argArray) {
-		var userCommand = process.argv[2].toLowerCase();
+		var userCommand = argArray[2].toLowerCase();
 		if (userCommand === "my-tweets") {
 			this.displayTweets();
 		} else if (userCommand === "spotify-this-song") {
-			this.spotifySong(this.concatUserInput());
+			this.spotifySong(this._concatUserInput(argArray));
 		} else if (userCommand === "movie-this") {
-			this.retrieveMovieInfo(this.concatUserInput());
+			this.retrieveMovieInfo(this._concatUserInput(argArray));
 		} else if (userCommand === "do-what-it-says") {
 			this.doWhatItSays();
 		} else {
-			this.tellUserTheyScrewedUp();
+			this._tellUserTheyScrewedUp();
 		}
 	},
 
@@ -80,31 +80,15 @@ var app = {
 		popsicle.get("http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&r=json")
 			.then((res) => {
 				var movieJSON = JSON.parse(res.body);
+				console.log();
 				if (!movieJSON.Title) {
 					popsicle.get("http://www.omdbapi.com/?t=" + this.defaultMovie + "&y=&plot=short&r=json")
 						.then((res) => {
-							console.log(res);
 							movieJSON = JSON.parse(res.body);
-							console.log("* Title: " + movieJSON.Title);
-							console.log("* Year: " + movieJSON.year);
-							console.log("* IMDB Rating: " + movieJSON.imdbRating);
-							console.log("* Country: " + movieJSON.Country);
-							console.log("* Language: " + movieJSON.Language);
-							console.log("* Plot: " + movieJSON.Plot);
-							console.log("* Actors: " + movieJSON.Actors);
-							console.log("* RottenTomatoes Rating: " + movieJSON.Ratings[1].Value);
-							console.log("* Rotten Tomatoes URL: https://www.rottentomatoes.com/m/" + movieJSON.Title.toLowerCase().replace(/\ /g, "_").replace(/\./g, ""));
+							this._printOutMovieData(movieJSON);
 						});
 				} else {
-					console.log("* Title: " + movieJSON.Title);
-					console.log("* Year: " + movieJSON.year);
-					console.log("* IMDB Rating: " + movieJSON.imdbRating);
-					console.log("* Country: " + movieJSON.Country);
-					console.log("* Language: " + movieJSON.Language);
-					console.log("* Plot: " + movieJSON.Plot);
-					console.log("* Actors: " + movieJSON.Actors);
-					console.log("* RottenTomatoes Rating: " + movieJSON.Ratings[1].Value);
-					console.log("* Rotten Tomatoes URL: https://www.rottentomatoes.com/m/" + movieJSON.Title.toLowerCase().replace(/\ /g, "_").replace(/\./g, ""));
+					this._printOutMovieData(movieJSON);
 				}
 			});
 	},
@@ -123,15 +107,27 @@ var app = {
 		});
 	},
 
-	tellUserTheyScrewedUp: function() {
+	_tellUserTheyScrewedUp: function() {
 		console.log();
 		console.log("Please enter valid command e.g.:");
 		console.log("'spotify-this-song' OR 'movie-this' OR 'do-what-it-says'");
 	},
 
-	concatUserInput: function() {
+	_printOutMovieData: function(movieJSON) {
+		console.log("* Title: " + movieJSON.Title);
+		console.log("* Year: " + movieJSON.year);
+		console.log("* IMDB Rating: " + movieJSON.imdbRating);
+		console.log("* Country: " + movieJSON.Country);
+		console.log("* Language: " + movieJSON.Language);
+		console.log("* Plot: " + movieJSON.Plot);
+		console.log("* Actors: " + movieJSON.Actors);
+		console.log("* RottenTomatoes Rating: " + movieJSON.Ratings[1].Value);
+		console.log("* Rotten Tomatoes URL: https://www.rottentomatoes.com/m/" + movieJSON.Title.toLowerCase().replace(/\ /g, "_").replace(/\./g, ""));
+	},
+
+	_concatUserInput: function(argArray) {
 		var userInput = "";
-		process.argv.slice(3).forEach(function(elem) {
+		argArray.slice(3).forEach(function(elem) {
 			userInput += elem + " "
 		});
 		if (!userInput) {
