@@ -1,5 +1,4 @@
 var keys = require("./keys.js");
-const spotify = require('spotify');
 const OAuth = require('oauth');
 const popsicle = require('popsicle');
 const fs = require('fs');
