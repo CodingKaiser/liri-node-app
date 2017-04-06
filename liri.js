@@ -55,7 +55,7 @@ var app = {
 			.use(popsicle.plugins.parse(['json', 'urlencoded']))
 			.then((res) => {
 				// if tracks found, display top one
-				if (res.body.tracks.items.length) {
+				if (song && res.body.tracks.items.length) {
 					popsicle.get("https://api.spotify.com/v1/tracks/" + res.body.tracks.items[0].id)
 						.use(popsicle.plugins.parse(['json', 'urlencoded']))
 						.then((res) => {
@@ -78,7 +78,7 @@ var app = {
 				var movieJSON = JSON.parse(res.body);
 				console.log(); // empty space in stdout for A E S T H E T I C S
 				// If movie not found, default to greatest film ever made
-				if (!movieJSON.Title) {
+				if (!movie && !movieJSON.Title) {
 					popsicle.get("http://www.omdbapi.com/?t=" + this.defaultMovie + "&y=&plot=short&r=json")
 						.then((res) => {
 							movieJSON = JSON.parse(res.body);
@@ -136,10 +136,6 @@ var app = {
 		argArray.slice(3).forEach(function(elem) {
 			userInput += elem + " "
 		});
-		if (!userInput) {
-			// If user gave no query, tell them they screwed up
-			throw "You didn't tell me what to search for!";
-		}
 		return userInput;
 	}
 };
