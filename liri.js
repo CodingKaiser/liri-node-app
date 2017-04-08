@@ -138,8 +138,8 @@ var app = {
 		if (movieJSON.Ratings[1] && movieJSON.Ratings[1].Value) {
 			console.log("* RottenTomatoes Rating: " + movieJSON.Ratings[1].Value);
 		}
-		console.log("* Rotten Tomatoes URL: https://www.rottentomatoes.com/m/" + 
-					movieJSON.Title.toLowerCase().replace(/\ /g, "_").replace(/\./g, "").replace(/\,/g, ""));
+		console.log("* Rotten Tomatoes URL: https://www.rottentomatoes.com/search/?search=" + 
+					movieJSON.Title.toLowerCase().replace(/\ /g, "%20").replace(/[\.\,\:]/g, ""));
 	},
 
 	_concatUserInput: function(argArray) {
