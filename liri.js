@@ -119,15 +119,27 @@ var app = {
 
 	_printOutMovieData: function(movieJSON) {
 		console.log("* Title: " + movieJSON.Title);
-		console.log("* Year: " + movieJSON.year);
-		console.log("* IMDB Rating: " + movieJSON.imdbRating);
-		console.log("* Country: " + movieJSON.Country);
-		console.log("* Language: " + movieJSON.Language);
+		if (movieJSON.year) {
+			console.log("* Year: " + movieJSON.year);
+		}
+		if (movieJSON.imdbRating) {
+			console.log("* IMDB Rating: " + movieJSON.imdbRating);
+		}
+		if (movieJSON.Country) {
+			console.log("* Country: " + movieJSON.Country);
+		}
+		if (movieJSON.Language) {
+			console.log("* Language: " + movieJSON.Language);
+		}
 		console.log("* Plot: " + movieJSON.Plot);
-		console.log("* Actors: " + movieJSON.Actors);
-		console.log("* RottenTomatoes Rating: " + movieJSON.Ratings[1].Value);
+		if (movieJSON.Actors) {
+			console.log("* Actors: " + movieJSON.Actors);
+		}
+		if (movieJSON.Ratings[1] && movieJSON.Ratings[1].Value) {
+			console.log("* RottenTomatoes Rating: " + movieJSON.Ratings[1].Value);
+		}
 		console.log("* Rotten Tomatoes URL: https://www.rottentomatoes.com/m/" + 
-					movieJSON.Title.toLowerCase().replace(/\ /g, "_").replace(/\./g, ""));
+					movieJSON.Title.toLowerCase().replace(/\ /g, "_").replace(/\./g, "").replace(/\,/g, ""));
 	},
 
 	_concatUserInput: function(argArray) {
